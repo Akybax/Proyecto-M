@@ -21,10 +21,17 @@ public class WeaponCollider : MonoBehaviour
             return;
         }
 
+        // Si tiene sistema de vida, aplica daño
         if (health != null)
         {
             health.TakeDamage(damage);
             Debug.Log($"{gameObject.name} golpeó a {other.name}");
+        }
+
+        // 👇 Aquí añadimos el chichón visual
+        if (enemyCombat != null)
+        {
+            enemyCombat.RecibirGolpe();
         }
     }
 

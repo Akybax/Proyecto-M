@@ -477,6 +477,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ch14_nonPBR
       objectReference: {fileID: 0}
+    - target: {fileID: 4315648579854482848, guid: e08c4a9e7a4065042b726635bc531568, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c884b1899eb4d7345ad055a4f02ded58, type: 2}
     - target: {fileID: 5866666021909216657, guid: e08c4a9e7a4065042b726635bc531568, type: 3}
       propertyPath: m_Avatar
       value: 
@@ -609,6 +613,10 @@ MonoBehaviour:
   parryKeyName: n
   animator: {fileID: 569931835}
   weapon: {fileID: 66517174}
+  chichones:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &569931842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1264,6 +1272,10 @@ MonoBehaviour:
   parryKeyName: Keypad2
   animator: {fileID: 1446903693}
   weapon: {fileID: 1110364889}
+  chichones:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &1446903691
 MonoBehaviour:
   m_ObjectHideFlags: 0
