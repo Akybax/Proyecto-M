@@ -4,13 +4,13 @@ using System.Collections; // necesario para usar corutinas
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Controles (escribe las teclas)")]
-    public string attackKeyName = "b";       // Player1: b  | Player2: keypad1
-    public string parryKeyName = "n";        // Player1: n  | Player2: keypad2
+    public string attackKeyName = "b"; // Player1: b | Player2: keypad1
+    public string parryKeyName = "n";  // Player1: n | Player2: keypad2
     public Animator animator;
-    public WeaponCollider weapon;            // referencia al palo
+    public WeaponCollider weapon;
 
     [Header("Sistema de Chichones")]
-    public GameObject[] chichones;           // arrastra los 3 chichones aquí
+    public GameObject[] chichones; // arrastra los 3 chichones aquí
     private int golpes = 0;
 
     bool isParrying = false;
@@ -19,11 +19,13 @@ public class PlayerCombat : MonoBehaviour
 
     void Start()
     {
-        // Convertimos el texto escrito a KeyCode real
-        attackKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), attackKeyName, true);
-        parryKey = (KeyCode)System.Enum.Parse(typeof(KeyCode), parryKeyName, true);
+        // Convierte texto en KeyCode real (usa TryParse para evitar errores)
+        if (!System.Enum.TryParse(attackKeyName, true, out attackKey))
+            attackKey = KeyCode.B;
+        if (!System.Enum.TryParse(parryKeyName, true, out parryKey))
+            parryKey = KeyCode.N;
 
-        // Asegurarnos de que los chichones estén ocultos al inicio
+        // Ocultar chichones al inicio
         foreach (GameObject c in chichones)
             if (c != null) c.SetActive(false);
     }
@@ -31,19 +33,13 @@ public class PlayerCombat : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(attackKey))
-        {
             Attack();
-        }
 
         if (Input.GetKeyDown(parryKey))
-        {
             StartParry();
-        }
 
         if (Input.GetKeyUp(parryKey))
-        {
             EndParry();
-        }
     }
 
     void Attack()
@@ -74,15 +70,11 @@ public class PlayerCombat : MonoBehaviour
         Debug.Log($"{gameObject.name} terminó el Parry.");
     }
 
-    public bool IsParrying()
-    {
-        return isParrying;
-    }
+    public bool IsParrying() => isParrying;
 
     // ============================================================
     // 🧠 SISTEMA DE CHICHONES
     // ============================================================
-
     public void RecibirGolpe()
     {
         if (golpes < chichones.Length)
@@ -101,8 +93,10 @@ public class PlayerCombat : MonoBehaviour
     {
         chichon.SetActive(true);
         chichon.transform.localScale = Vector3.zero;
-        float t = 0;
-        while (t < 1)
+        float t = 0f;
+
+        // Animación de aparición suave
+        while (t < 1f)
         {
             t += Time.deltaTime * 5f;
             chichon.transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
@@ -115,10 +109,10 @@ public class PlayerCombat : MonoBehaviour
         Debug.Log($"{gameObject.name} perdió la ronda!");
         golpes = 0;
 
-        // Ocultamos todos los chichones
         foreach (GameObject c in chichones)
             if (c != null) c.SetActive(false);
 
-        // Aquí podrías resetear posiciones, animaciones o invocar un GameManager
+        // 🔹 Notifica al GameManager
+        FindObjectOfType<GameManager>()?.PlayerDefeated(gameObject);
     }
 }

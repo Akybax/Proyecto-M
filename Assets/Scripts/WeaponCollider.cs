@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class WeaponCollider : MonoBehaviour
 {
+    [Header("Configuración de daño")]
     public int damage = 1;
     public string enemyTag = "Player";
+
     private bool canDealDamage = false;
 
     void OnTriggerEnter(Collider other)
@@ -11,30 +13,32 @@ public class WeaponCollider : MonoBehaviour
         if (!canDealDamage) return;
         if (!other.CompareTag(enemyTag)) return;
 
-        HealthSystem health = other.GetComponent<HealthSystem>();
+        // Obtenemos los componentes del objetivo
         PlayerCombat enemyCombat = other.GetComponent<PlayerCombat>();
+        HealthSystem health = other.GetComponent<HealthSystem>();
 
-        // Si el enemigo está haciendo parry, no recibe daño
+        // Si el enemigo hace parry, no recibe daño ni chichón
         if (enemyCombat != null && enemyCombat.IsParrying())
         {
             Debug.Log($"{other.name} bloqueó el golpe con parry!");
             return;
         }
 
-        // Si tiene sistema de vida, aplica daño
+        // ⚡ Primero mostramos el efecto visual del golpe (chichón)
+        if (enemyCombat != null && other.gameObject.activeInHierarchy)
+        {
+            enemyCombat.RecibirGolpe();
+        }
+
+        // ❤️ Luego aplicamos el daño (podría desactivar el objeto)
         if (health != null)
         {
             health.TakeDamage(damage);
             Debug.Log($"{gameObject.name} golpeó a {other.name}");
         }
-
-        // 👇 Aquí añadimos el chichón visual
-        if (enemyCombat != null)
-        {
-            enemyCombat.RecibirGolpe();
-        }
     }
 
+    // Activar o desactivar la capacidad de causar daño
     public void EnableDamage() => canDealDamage = true;
     public void DisableDamage() => canDealDamage = false;
 }

@@ -10,30 +10,30 @@ public class HealthSystem : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-  public void TakeDamage(int amount)
-{
-    // Si el jugador está haciendo parry, ignora el golpe
-    PlayerCombat combat = GetComponent<PlayerCombat>();
-    if (combat != null && combat.IsParrying())
+    public void TakeDamage(int amount)
     {
-        Debug.Log(gameObject.name + " bloqueó el golpe!");
-        return;
-    }
+        PlayerCombat combat = GetComponent<PlayerCombat>();
+        if (combat != null && combat.IsParrying())
+        {
+            Debug.Log(gameObject.name + " bloqueó el golpe!");
+            return;
+        }
 
-    currentHealth -= amount;
-    Debug.Log(gameObject.name + " recibió daño. Vida restante: " + currentHealth);
+        currentHealth -= amount;
+        Debug.Log(gameObject.name + " recibió daño. Vida restante: " + currentHealth);
 
-    if (currentHealth <= 0)
-    {
-        Die();
+        if (currentHealth <= 0)
+            Die();
     }
-}
 
     void Die()
     {
         Debug.Log(gameObject.name + " ha sido noqueado!");
-        gameObject.SetActive(false); // desactiva al jugador
+
+        // Primero notifica al GameManager
         FindObjectOfType<GameManager>()?.PlayerDefeated(gameObject);
+
+        // Luego desactiva al jugador
+        gameObject.SetActive(false);
     }
-    
 }

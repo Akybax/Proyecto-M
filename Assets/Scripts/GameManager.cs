@@ -4,29 +4,31 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    
+
     private bool roundRestarting = false;
 
-   void Awake()
-{
-    if (Instance == null)
+    void Awake()
     {
-        Instance = this;
-        DontDestroyOnLoad(gameObject); // <-- Opcional: mantiene el GameManager entre escenas
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // mantiene el GameManager entre escenas
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
-    else if (Instance != this)
-    {
-        Destroy(gameObject);
-    }
-}
+
     void Start()
     {
-        SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive); // <-- Juego es la 0
+        // Asegúrate de que las escenas estén en Build Settings (índice 0 = base, 1 = juego)
+        SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
     }
 
     public void PlayerDefeated(GameObject defeatedPlayer)
     {
-        if (roundRestarting) return; // Evita que se llame dos veces
+        if (roundRestarting) return;
 
         roundRestarting = true;
         Debug.Log("Jugador derrotado: " + defeatedPlayer.name);
@@ -35,11 +37,15 @@ public class GameManager : MonoBehaviour
         Invoke(nameof(RestartRound), 2f);
     }
 
-    private void RestartRound()
-    {     
-            SceneManager.UnloadSceneAsync(0);
-            SceneManager.UnloadSceneAsync(1);       
-            SceneManager.LoadSceneAsync(0); 
-            SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive); // <-- Juego es la 0
-    }
+private void RestartRound()
+{
+    Debug.Log("Reiniciando SampleScene...");
+
+    // 🔹 Recarga solo la escena de juego
+    SceneManager.UnloadSceneAsync("SampleScene");
+    SceneManager.LoadSceneAsync("SampleScene", LoadSceneMode.Additive);
+
+    roundRestarting = false;
+}
+
 }
