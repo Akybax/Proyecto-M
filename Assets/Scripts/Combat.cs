@@ -96,7 +96,7 @@ public class PlayerCombat : MonoBehaviour
         float t = 0f;
 
         // Animación de aparición suave
-        while (t < 1f)
+        if (t < 1f)
         {
             t += Time.deltaTime * 5f;
             chichon.transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
