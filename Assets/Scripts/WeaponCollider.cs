@@ -21,6 +21,7 @@ public class WeaponCollider : MonoBehaviour
         if (enemyCombat != null && enemyCombat.IsParrying())
         {
             Debug.Log($"{other.name} bloqueó el golpe con parry!");
+            SFXManager.Instance.PlayParry();
             return;
         }
 

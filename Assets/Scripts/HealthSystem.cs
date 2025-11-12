@@ -16,10 +16,14 @@ public class HealthSystem : MonoBehaviour
         if (combat != null && combat.IsParrying())
         {
             Debug.Log(gameObject.name + " bloqueó el golpe!");
-            return;
+           
+             return;
         }
 
         currentHealth -= amount;
+
+        SFXManager.Instance.PlayDaño();
+        
         Debug.Log(gameObject.name + " recibió daño. Vida restante: " + currentHealth);
 
         if (currentHealth <= 0)

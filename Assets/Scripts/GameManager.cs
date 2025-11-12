@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
         roundRestarting = true;
         Debug.Log("Jugador derrotado: " + defeatedPlayer.name);
 
+        SFXManager.Instance.PlayFinRonda();
         // Esperar 2 segundos antes de reiniciar
         Invoke(nameof(RestartRound), 2f);
     }

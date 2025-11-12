@@ -46,7 +46,9 @@ public class PlayerCombat : MonoBehaviour
     {
         if (animator != null)
             animator.SetTrigger("Attack");
-
+            
+        SFXManager.Instance.PlayGolpe();
+        
         weapon.EnableDamage();
         Invoke(nameof(StopAttack), 1f); // duración del golpe
     }

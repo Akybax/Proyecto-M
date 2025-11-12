@@ -9,6 +9,7 @@ public class SFXManager : MonoBehaviour
     public AudioClip golpeClip;
     public AudioClip dañoClip;
     public AudioClip finRondaClip;
+    public AudioClip ParryClip;
 
     private bool sfxMuted = false;
 
@@ -38,6 +39,11 @@ public class SFXManager : MonoBehaviour
     public void PlayFinRonda()
     {
         PlaySound(finRondaClip);
+    }
+
+     public void PlayParry()
+    {
+        PlaySound(ParryClip);
     }
 
     private void PlaySound(AudioClip clip)
