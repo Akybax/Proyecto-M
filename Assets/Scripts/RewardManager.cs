@@ -5,11 +5,11 @@ public class RewardManager : MonoBehaviour
 {
     public static RewardManager Instance;
 
-    // Prefab del sombrero que se agregará al jugador
+    [Header("Prefab del sombrero que se agregará al jugador")]
     public GameObject sombreroPrefab;
 
-    // Diccionario que guarda los jugadores y la cantidad de sombreros que tienen
-    private Dictionary<GameObject, int> recompensasJugadores = new Dictionary<GameObject, int>();
+    // Diccionario que guarda las recompensas por nombre de jugador
+    private Dictionary<string, int> recompensasJugadores = new Dictionary<string, int>();
 
     void Awake()
     {
@@ -24,45 +24,105 @@ public class RewardManager : MonoBehaviour
         }
     }
 
-    // Llamar cuando alguien gane la ronda
+    // 🔹 Llamado cuando un jugador gana una ronda
     public void DarRecompensa(GameObject jugadorGanador)
     {
-        if (!recompensasJugadores.ContainsKey(jugadorGanador))
+        if (jugadorGanador == null)
         {
-            recompensasJugadores[jugadorGanador] = 0;
+            Debug.LogWarning("RewardManager: jugadorGanador es NULL");
+            return;
         }
 
-        recompensasJugadores[jugadorGanador]++;
-        Debug.Log("🎉 " + jugadorGanador.name + " ganó un sombrero. Total: " + recompensasJugadores[jugadorGanador]);
+        string nombre = jugadorGanador.name;
+
+        if (!recompensasJugadores.ContainsKey(nombre))
+            recompensasJugadores[nombre] = 0;
+
+        recompensasJugadores[nombre]++;
+        Debug.Log($"🎉 {nombre} ganó un sombrero. Total acumulado: {recompensasJugadores[nombre]}");
     }
 
-    // Llamar al iniciar la ronda para aplicar todos los sombreros acumulados
+    // 🔹 Llamado al iniciar una nueva ronda para aplicar todas las recompensas
     public void AplicarRecompensas(GameObject jugador)
     {
-        if (sombreroPrefab == null) return;
-
-        if (recompensasJugadores.ContainsKey(jugador))
+        if (jugador == null)
         {
-            int cantidad = recompensasJugadores[jugador];
-
-            for (int i = 0; i < cantidad; i++)
-            {
-                GameObject sombrero = Instantiate(sombreroPrefab);
-                sombrero.transform.SetParent(jugador.transform);
-
-                // Colocar los sombreros en altura, uno sobre otro
-                sombrero.transform.localPosition = Vector3.up * (1.5f + i * 0.5f); 
-                sombrero.transform.localRotation = Quaternion.identity;
-            }
+            Debug.LogWarning("RewardManager: jugador es NULL, no se puede aplicar recompensa.");
+            return;
         }
+
+        if (sombreroPrefab == null)
+        {
+            Debug.LogError("🚫 No hay prefab de sombrero asignado en el RewardManager.");
+            return;
+        }
+
+        string nombre = jugador.name;
+
+        if (!recompensasJugadores.ContainsKey(nombre))
+        {
+            Debug.Log($"⚠️ {nombre} no tiene recompensas registradas.");
+            return;
+        }
+
+        int cantidad = recompensasJugadores[nombre];
+        if (cantidad <= 0)
+        {
+            Debug.Log($"ℹ️ {nombre} no tiene sombreros aún.");
+            return;
+        }
+
+        // 🔹 Buscar el punto de anclaje "Cabeza"
+        Transform puntoCabeza = jugador.GetComponentInChildren<Transform>(true);
+        puntoCabeza = FindChildRecursive(jugador.transform, "Cabeza");
+
+        if (puntoCabeza == null)
+        {
+            Debug.LogWarning($"⚠️ {nombre} no tiene objeto 'Cabeza'. Se usará el transform del jugador.");
+            puntoCabeza = jugador.transform;
+        }
+
+        // 🧹 Eliminar sombreros anteriores
+        foreach (Transform hijo in puntoCabeza)
+        {
+            if (hijo.name.StartsWith("Sombrero"))
+                Destroy(hijo.gameObject);
+        }
+
+        // 🧢 Instanciar tantos sombreros como victorias tenga el jugador
+        for (int i = 0; i < cantidad; i++)
+        {
+            GameObject sombrero = Instantiate(sombreroPrefab, puntoCabeza);
+            sombrero.name = "Sombrero_" + (i + 1);
+
+            // 📍 Posicionar cada sombrero un poco más alto que el anterior
+            sombrero.transform.localPosition = Vector3.up * (0.18f * i);
+            sombrero.transform.localRotation = Quaternion.identity;
+            sombrero.transform.localScale = Vector3.one * 1.0f;
+        }
+
+        Debug.Log($"🧢 {nombre} tiene ahora {cantidad} sombrero(s) apilados correctamente sobre 'Cabeza'");
     }
 
-    // Reinicia las recompensas si quieres limpiar al final del juego
-    public void ReiniciarRecompensas(GameObject jugador)
+    // 🔹 Reiniciar todas las recompensas (opcional)
+    public void ReiniciarRecompensas()
     {
-        if (recompensasJugadores.ContainsKey(jugador))
-        {
-            recompensasJugadores[jugador] = 0;
-        }
+        recompensasJugadores.Clear();
+        Debug.Log("🎯 Todas las recompensas han sido reiniciadas.");
     }
+    // 🔍 Búsqueda recursiva para encontrar un hijo por nombre en toda la jerarquía
+private Transform FindChildRecursive(Transform parent, string childName)
+{
+    foreach (Transform child in parent)
+    {
+        if (child.name == childName)
+            return child;
+
+        Transform result = FindChildRecursive(child, childName);
+        if (result != null)
+            return result;
+    }
+    return null;
+}
+
 }
