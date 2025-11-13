@@ -18,12 +18,24 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // Pausar inmediatamente
+        Time.timeScale = 0f;
+        Debug.Log("⏸ Juego iniciado en pausa (Awake)");
     }
 
     void Start()
     {
-        // Asegúrate de que las escenas estén en Build Settings (índice 0 = base, 1 = juego)
-        SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
+        // Carga la escena y asegura que quede pausada al terminar de cargar
+        var asyncLoad = SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
+        asyncLoad.completed += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(AsyncOperation obj)
+    {
+        // 🔹 Pausar otra vez por si algún script la reanudó al cargar
+        Time.timeScale = 0f;
+        Debug.Log("⏸ Escena cargada y juego en pausa");
     }
 
     public void PlayerDefeated(GameObject defeatedPlayer)
@@ -34,19 +46,19 @@ public class GameManager : MonoBehaviour
         Debug.Log("Jugador derrotado: " + defeatedPlayer.name);
 
         SFXManager.Instance.PlayFinRonda();
-        // Esperar 2 segundos antes de reiniciar
         Invoke(nameof(RestartRound), 2f);
     }
 
-private void RestartRound()
-{
-    Debug.Log("Reiniciando SampleScene...");
+    private void RestartRound()
+    {
+        Debug.Log("Reiniciando SampleScene...");
 
-    // 🔹 Recarga solo la escena de juego
-    SceneManager.UnloadSceneAsync("SampleScene");
-    SceneManager.LoadSceneAsync("SampleScene", LoadSceneMode.Additive);
-
-    roundRestarting = false;
-}
-
+        SceneManager.UnloadSceneAsync("SampleScene");
+        var asyncLoad = SceneManager.LoadSceneAsync("SampleScene", LoadSceneMode.Additive);
+        asyncLoad.completed += (op) =>
+        {
+            roundRestarting = false;
+          
+        };
+    }
 }

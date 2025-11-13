@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        RewardManager.Instance.AplicarRecompensas(gameObject);
         controller = GetComponent<CharacterController>();
     }
 
