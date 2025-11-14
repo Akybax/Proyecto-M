@@ -2,6 +2,17 @@ using UnityEngine;
 
 public class OpcionesAudio : MonoBehaviour
 {
+    public Animator personajeAnimator; 
+    public string animacionTrigger = "Reaccion";
+
+    void Start()
+{
+    if (personajeAnimator != null)
+    {
+        personajeAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+    }
+}
+
     public void ToggleMusica()
     {
         if (GameManager.Instance != null)
@@ -11,6 +22,12 @@ public class OpcionesAudio : MonoBehaviour
             {
                 musica.mute = !musica.mute;
                 Debug.Log("Música mute: " + musica.mute);
+                
+            if (personajeAnimator != null)
+                {
+                    personajeAnimator.SetTrigger(animacionTrigger);
+                }   
+
             }
         }
         else
